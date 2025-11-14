@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Malar Food Shop | Tasty & Quick</title>
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+
+<style>
+  body {
+    font-family: 'Roboto', sans-serif;
+    background: #fff7f0;
+    color: #4a342e;
+    margin: 0;
+    padding: 0 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  header {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #b34700;
+    margin: 40px 0 20px;
+    letter-spacing: 3px;
+    text-align: center;
+    text-shadow: 1px 1px 5px #ffb34788;
+  }
+
+  main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    max-width: 900px;
+    width: 100%;
+  }
+
+  @media (max-width: 720px) {
+    main {
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+  }
+
+  section {
+    background: white;
+    border-radius: 18px;
+    box-shadow: 0 6px 15px rgba(179, 71, 0, 0.2);
+    padding: 30px 25px;
+  }
+
+  h2 {
+    border-bottom: 3px solid #ff7f2a;
+    padding-bottom: 12px;
+    color: #d35400;
+    font-weight: 700;
+    margin-bottom: 25px;
+  }
+
+  .menu-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #ffdbb6;
+  }
+
+  .menu-item:last-child {
+    border-bottom: none;
+  }
+
+  .item-name {
+    font-weight: 700;
+    font-size: 1.15rem;
+  }
+
+  .item-price {
+    color: #b34700;
+    font-weight: 700;
+    margin-right: 15px;
+  }
+
+  .btn-add {
+    background-color: #ff7f2a;
+    border: none;
+    border-radius: 22px;
+    color: white;
+    padding: 8px 22px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.25s ease;
+  }
+
+  .btn-add:hover {
+    background-color: #b34700;
+  }
+
+  /* Cart styles */
+  #cartItems {
+    max-height: 280px;
+    overflow-y: auto;
+  }
+
+  .cart-item {
+    display: flex;
+    justify-content: space-between;
+    background: #ffefdb;
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  .cart-item button {
+    background: transparent;
+    border: none;
+    color: #b34700;
+    font-size: 1.3rem;
+    font-weight: 900;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 5px;
+  }
+
+  .cart-total {
+    font-weight: 700;
+    font-size: 1.4rem;
+    margin-top: 25px;
+    color: #b34700;
+    text-align: right;
+  }
+
+  .btn-order {
+    margin-top: 25px;
+    width: 100%;
+    padding: 16px 0;
+    background-color: #b34700;
+    border: none;
+    border-radius: 14px;
+    color: white;
+    font-weight: 700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow: 0 5px 12px rgba(179, 71, 0, 0.4);
+    transition: background-color 0.3s ease;
+  }
+
+  .btn-order:hover {
+    background-color: #7a2700;
+  }
+</style>
+</head>
+<body>
+
+<header>Doraro Food Shop 🍛</header>
+
+<main>
+  <!-- Menu Section -->
+  <section aria-label="Menu Items">
+    <h2>Menu</h2>
+    <div class="menu-item">
+      <span class="item-name">Masala Dosa</span>
+      <span class="item-price">₹120</span>
+      <button class="btn-add" onclick="addToCart('Masala Dosa', 120)">Add</button>
+    </div>
+    <div class="menu-item">
+      <span class="item-name">Paneer Butter Masala</span>
+      <span class="item-price">₹180</span>
+      <button class="btn-add" onclick="addToCart('Paneer Butter Masala', 180)">Add</button>
+    </div>
+    <div class="menu-item">
+      <span class="item-name">Chicken Biryani</span>
+      <span class="item-price">₹250</span>
+      <button class="btn-add" onclick="addToCart('Chicken Biryani', 250)">Add</button>
+    </div>
+    <div class="menu-item">
+      <span class="item-name">Gulab Jamun</span>
+      <span class="item-price">₹60</span>
+      <button class="btn-add" onclick="addToCart('Gulab Jamun', 60)">Add</button>
+    </div>
+  </section>
+
+  <!-- Cart Section -->
+  <section aria-label="Shopping Cart">
+    <h2>Your Cart</h2>
+    <div id="cartItems" aria-live="polite" aria-atomic="true"></div>
+    <div class="cart-total">Total: ₹<span id="total">0</span></div>
+    <button class="btn-order" onclick="placeOrder()">Place Order</button>
+  </section>
+</main>
+
+<script>
+  const cart = [];
+  let total = 0;
+
+  function addToCart(name, price) {
+    cart.push({ name, price });
+    total += price;
+    updateCart();
+  }
+
+  function updateCart() {
+    const cartItems = document.getElementById('cartItems');
+    const totalSpan = document.getElementById('total');
+    cartItems.innerHTML = '';
+
+    if (cart.length === 0) {
+      cartItems.innerHTML = '<p>Your cart is empty.</p>';
+      totalSpan.textContent = '0';
+      return;
+    }
+
+    cart.forEach((item, index) => {
+      const itemDiv = document.createElement('div');
+      itemDiv.className = 'cart-item';
+      itemDiv.innerHTML = `
+        <span>${item.name}</span>
+        <span>₹${item.price} <button aria-label="Remove ${item.name} from cart" onclick="removeFromCart(${index})">&times;</button></span>
+      `;
+      cartItems.appendChild(itemDiv);
+    });
+
+    totalSpan.textContent = total;
+  }
+
+  function removeFromCart(index) {
+    total -= cart[index].price;
+    cart.splice(index, 1);
+    updateCart();
+  }
+
+  function placeOrder() {
+    if (cart.length === 0) {
+      alert('Your cart is empty! Please add some tasty food first 😄');
+      return;
+    }
+    alert(`Thank you for ordering from Malar Food Shop! Your total is ₹${total}. Enjoy your meal! 🍛`);
+    cart.length = 0;  // clear cart
+    total = 0;
+    updateCart();
+  }
+
+  // Initialize cart display
+  updateCart();
+</script>
+
+</body>
+</html>
